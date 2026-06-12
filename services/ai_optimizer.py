@@ -37,7 +37,19 @@ SYSTEM_PROMPT = """
 
 class AIOptimizer:
     @staticmethod
-    def optimize(jd_text: str, current_resume: ResumeOutput) -> ResumeOutput:
+    def optimize(jd_text: str, current_resume: ResumeOutput, section_counts=None) -> ResumeOutput:
+        section_counts = section_counts or {}
+        experience_count = section_counts.get("experiences", len(current_resume.experiences))
+        project_count = section_counts.get("projects", len(current_resume.projects))
+        response_example = {
+            "summary": "",
+            "experiences": [[] for _ in range(experience_count)],
+            "skills": {
+                "Dynamic Category Name": []
+            },
+            "projects": [[] for _ in range(project_count)],
+        }
+
         prompt = f"""
             JOB DESCRIPTION:
             {jd_text}
@@ -50,26 +62,11 @@ class AIOptimizer:
             Do not use a hardcoded category set. It is acceptable to keep stable
             categories like "Core Skills" or "Programming Languages" when they fit.
             Keep skill lists concise, deduplicated, and ordered by relevance.
+            Return exactly {experience_count} experience sections in "experiences".
+            Return exactly {project_count} project sections in "projects".
             Return JSON in EXACTLY this format:
 
-            {{
-                "summary": "",
-
-                "experience_1": [],
-                "experience_2": [],
-                "experience_3": [],
-                "experience_4": [],
-                "experience_5": [],
-
-                "skills": {{
-                    "Dynamic Category Name": []
-                }},
-
-                "project_1": [],
-                "project_2": [],
-                "project_3": [],
-                "project_4": []
-            }}
+            {json.dumps(response_example, indent=4)}
         """
 
         response = client.chat.completions.create(

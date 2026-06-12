@@ -7,6 +7,8 @@ from docx.shared import Inches, Pt
 class DocxWriter:
     FONT_SIZE = 10
     PLACEHOLDER_PATTERN = re.compile(r"\{\{\s*([^{}]+?)\s*\}\}")
+    EXPERIENCE_PATTERN = re.compile(r"^EXPERIENCE_(\d+)$")
+    PROJECT_PATTERN = re.compile(r"^PROJECT_(\d+)$")
 
     @staticmethod
     def apply_font(paragraph):
@@ -82,6 +84,29 @@ class DocxWriter:
                         yield paragraph
 
     @staticmethod
+    def get_template_section_counts(template_path):
+        doc = Document(template_path)
+        experience_indexes = set()
+        project_indexes = set()
+
+        for paragraph in DocxWriter.iter_paragraphs(doc):
+            for match in DocxWriter.PLACEHOLDER_PATTERN.findall(paragraph.text):
+                placeholder = DocxWriter.normalize_placeholder_name(match)
+                experience_match = DocxWriter.EXPERIENCE_PATTERN.match(placeholder)
+                project_match = DocxWriter.PROJECT_PATTERN.match(placeholder)
+
+                if experience_match:
+                    experience_indexes.add(int(experience_match.group(1)))
+
+                if project_match:
+                    project_indexes.add(int(project_match.group(1)))
+
+        return {
+            "experiences": max(experience_indexes, default=0),
+            "projects": max(project_indexes, default=0),
+        }
+
+    @staticmethod
     def format_field_value(field, value):
         if field == "skills":
             return DocxWriter.build_skill_section(value)
@@ -96,22 +121,11 @@ class DocxWriter:
             "SKILLS": DocxWriter.format_field_value("skills", resume_data["skills"]),
         }
 
-        experience_fields = [
-            field
-            for field in resume_data
-            if field not in {"summary", "skills"} and not field.startswith("project_")
-        ]
-        project_fields = [
-            field
-            for field in resume_data
-            if field.startswith("project_")
-        ]
+        for index, bullets in enumerate(resume_data["experiences"], start=1):
+            replacements[f"EXPERIENCE_{index}"] = bullets
 
-        for index, field in enumerate(experience_fields, start=1):
-            replacements[f"EXPERIENCE_{index}"] = resume_data[field]
-
-        for index, field in enumerate(project_fields, start=1):
-            replacements[f"PROJECT_{index}"] = resume_data[field]
+        for index, bullets in enumerate(resume_data["projects"], start=1):
+            replacements[f"PROJECT_{index}"] = bullets
 
         return replacements
 

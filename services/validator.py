@@ -3,17 +3,28 @@ from models.schemas import ResumeOutput
 
 class ResumeValidator:
     @staticmethod
-    def validate(resume: ResumeOutput):
+    def validate(resume: ResumeOutput, section_counts=None):
+        section_counts = section_counts or {}
+        experience_count = section_counts.get("experiences", len(resume.experiences))
+        project_count = section_counts.get("projects", len(resume.projects))
+
         ResumeValidator._validate_summary(resume.summary)
-        ResumeValidator._validate_bullets(resume.experience_1, "EXPERIENCE_1")
-        ResumeValidator._validate_bullets(resume.experience_2, "EXPERIENCE_2")
-        ResumeValidator._validate_bullets(resume.experience_3, "EXPERIENCE_3")
-        ResumeValidator._validate_bullets(resume.experience_4, "EXPERIENCE_4")
-        ResumeValidator._validate_bullets(resume.experience_5, "EXPERIENCE_5")
-        ResumeValidator._validate_projects(resume.project_1)
-        ResumeValidator._validate_projects(resume.project_2)
-        ResumeValidator._validate_projects(resume.project_3)
-        ResumeValidator._validate_projects(resume.project_4)
+        ResumeValidator._validate_section_count(resume.experiences, experience_count, "experience")
+        ResumeValidator._validate_section_count(resume.projects, project_count, "project")
+
+        for index, bullets in enumerate(resume.experiences[:experience_count], start=1):
+            ResumeValidator._validate_bullets(bullets, f"EXPERIENCE_{index}")
+
+        for project in resume.projects[:project_count]:
+            ResumeValidator._validate_projects(project)
+
+    @staticmethod
+    def _validate_section_count(sections, expected_count, section_type):
+        if len(sections) < expected_count:
+            raise ValueError(
+                f"Template requires {expected_count} {section_type} sections, "
+                f"but resume only has {len(sections)}"
+            )
 
     @staticmethod
     def _validate_summary(summary):

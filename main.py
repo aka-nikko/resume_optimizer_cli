@@ -14,16 +14,17 @@ from services.base_resume import BASE_RESUME
 
 def main(resume, jd, output, mode):
     jd_text = JDParser.parse(jd)
+    section_counts = DocxWriter.get_template_section_counts(resume)
 
     if mode == "local":
         result = BASE_RESUME
     elif mode == "ai":
         base_resume = BASE_RESUME
-        result = AIOptimizer.optimize(jd_text, base_resume)
+        result = AIOptimizer.optimize(jd_text, base_resume, section_counts)
     else:
         raise ValueError(f"Unknown mode: {mode}")
 
-    ResumeValidator.validate(result)
+    ResumeValidator.validate(result, section_counts)
     DocxWriter.replace_placeholders(template_path=resume, output_path=output, resume=result)
 
     print(f"Resume generated: {output}")
