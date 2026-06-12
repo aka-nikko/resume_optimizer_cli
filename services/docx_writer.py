@@ -3,9 +3,12 @@ from copy import deepcopy
 from pathlib import Path
 
 from docx import Document
+from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_LINE_SPACING
 from docx.opc.exceptions import PackageNotFoundError
 from docx.shared import Inches, Pt
 from docx.text.paragraph import Paragraph
+
+from models.schemas import ResumeOutput
 
 
 class DocxWriter:
@@ -47,34 +50,40 @@ class DocxWriter:
             run.font.size = Pt(DocxWriter.FONT_SIZE)
 
     @staticmethod
+    def apply_bullet_format(paragraph):
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT
+        paragraph.paragraph_format.left_indent = Inches(0)
+        paragraph.paragraph_format.first_line_indent = Inches(0)
+        paragraph.paragraph_format.line_spacing_rule = WD_LINE_SPACING.SINGLE
+        paragraph.paragraph_format.line_spacing = 1
+        paragraph.paragraph_format.space_before = Pt(0)
+        paragraph.paragraph_format.space_after = Pt(0)
+
+    @staticmethod
     def insert_bullet_list(paragraph, bullets):
         if not bullets:
             raise ValueError("Cannot insert an empty bullet list into the template")
 
         current = paragraph
         current.clear()
-        current.add_run("• ")
+        current.add_run("    • ")
         DocxWriter.add_markdown_bold(current, bullets[0])
-
-        current.paragraph_format.left_indent = Inches(0.25)
-        current.paragraph_format.first_line_indent = Inches(0)
+        DocxWriter.apply_bullet_format(current)
 
         for bullet in bullets[1:]:
             new_p = deepcopy(current._element)
             current._element.addnext(new_p)
             current = Paragraph(new_p,paragraph._parent)
             current.clear()
-            current.add_run("• ")
+            current.add_run("    • ")
             DocxWriter.add_markdown_bold(current, bullet)
-
-            current.paragraph_format.left_indent = Inches(0.25)
-            current.paragraph_format.first_line_indent = Inches(0)
+            DocxWriter.apply_bullet_format(current)
 
     @staticmethod
     def build_skill_section(skills):
         lines = []
 
-        for category, skill_list in skills.items():
+        for category, skill_list in ResumeOutput.order_skill_categories(skills).items():
             if not skill_list:
                 continue
 

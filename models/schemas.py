@@ -1,13 +1,31 @@
-from typing import Dict, List
+from typing import ClassVar, Dict, List
 
 from pydantic import BaseModel, Field, field_validator
 
 
 class ResumeOutput(BaseModel):
+    PROGRAMMING_LANGUAGES_CATEGORY: ClassVar[str] = "Programming Languages"
+
     summary: str
     experiences: List[List[str]] = Field(default_factory=list)
     skills: Dict[str, List[str]] = Field(default_factory=dict)
     projects: List[List[str]] = Field(default_factory=list)
+
+    @staticmethod
+    def order_skill_categories(skills: Dict[str, List[str]]) -> Dict[str, List[str]]:
+        programming_languages = None
+        ordered_skills = {}
+
+        for category, skill_list in skills.items():
+            if category.casefold() == ResumeOutput.PROGRAMMING_LANGUAGES_CATEGORY.casefold():
+                programming_languages = (ResumeOutput.PROGRAMMING_LANGUAGES_CATEGORY, skill_list)
+            else:
+                ordered_skills[category] = skill_list
+
+        if programming_languages is None:
+            return ordered_skills
+
+        return {programming_languages[0]: programming_languages[1], **ordered_skills}
 
     @field_validator("summary")
     @classmethod
@@ -47,4 +65,4 @@ class ResumeOutput(BaseModel):
 
             normalized_skills[category_name] = list(dict.fromkeys(skill_values))
 
-        return normalized_skills
+        return ResumeOutput.order_skill_categories(normalized_skills)

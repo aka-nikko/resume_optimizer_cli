@@ -37,10 +37,11 @@ BASE_RESUME = ResumeOutput(
     ],
 
     skills={
-        "Embedded & Automotive": ["C", "C++", "QNX", "Linux", "Embedded Systems", "Automotive Software", "ADAS", "AUTOSAR", "Camera Systems", "IPC",
+        "Programming Languages": ["C", "C++", "Python", "Java", "JavaScript", "SQL"],
+        "Embedded & Automotive": ["QNX", "Linux", "Embedded Systems", "Automotive Software", "ADAS", "AUTOSAR", "Camera Systems", "IPC",
     "Multithreading", "Memory Management", "Performance Optimization", "Debugging", "Cross Compilation", "Real-Time Systems"],
         "Software Engineering": ["Data Structures", "Algorithms", "Low-Level Design", "Design Patterns", "OOPs", "Git", "CI/CD", "Agile Development"],
-        "Backend & Full Stack": ["Python", "Django", "Flask", "FastAPI", "Spring Boot", "React", "Node.js", "REST APIs", "MySQL", "PostgreSQL"],
+        "Backend & Full Stack": ["Django", "Flask", "FastAPI", "Spring Boot", "React", "Node.js", "REST APIs", "MySQL", "PostgreSQL"],
         "AI & Automation": ["OpenAI API", "Hugging Face", "LLM Fine-Tuning", "Selenium", "Playwright", "FFmpeg", "NumPy", "Pandas"]
     },
 

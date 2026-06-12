@@ -40,10 +40,10 @@ class ResumeValidator:
         words = len(summary.split())
 
         if words < 50:
-            raise ValueError(f"Summary too short: expected 50-80 words, got {words}")
+            raise ValueError(f"Summary too short: expected 50-65 words, got {words}")
 
-        if words > 80:
-            raise ValueError(f"Summary too long: expected 50-80 words, got {words}")
+        if words > 65:
+            raise ValueError(f"Summary too long: expected 50-65 words, got {words}")
 
     @staticmethod
     def _validate_skills(skills):
