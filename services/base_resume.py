@@ -3,39 +3,39 @@ from models.schemas import ResumeOutput
 
 BASE_RESUME = ResumeOutput(
     summary=(
-        "Embedded Software Engineer with 2.5+ years of experience building real-time automotive systems "
-        "using C/C++, specializing in camera pipelines, performance optimization, and low-level debugging "
-        "on QNX-based systems. Experienced in designing modular, platform agnostic architectures and "
-        "debugging complex system-level issues. Additional experience in backend and full-stack development "
+        "**Embedded Software Engineer** with 2.5+ years of experience building real-time **automotive systems** "
+        "using **C/C++**, specializing in **camera pipelines**, **performance optimization**, and **low-level debugging** "
+        "on **QNX-based systems**. Experienced in designing **modular, platform agnostic architectures** and "
+        "debugging complex system-level issues. Additional experience in backend and **full-stack development** "
         "with a focus on scalable, production-ready systems."
     ),
 
     kpit_se=[
-        "Developed real-time camera pipeline and ADAS related features for BMW systems on QNX-based HLOS. ",
-        "Optimized C/C++ modules to reduce latency and memory footprint in performance-critical embedded environments. ",
-        "Built and deployed applications on QNX, handling cross-compilation and integration with system-level services. ",
-        "Designed platform-agnostic interfaces to improve portability and reduce duplication across modules. "
+        "Developed **real-time camera pipeline** and **ADAS** related features for BMW systems on **QNX-based HLOS**.",
+        "Optimized **C/C++** modules to reduce **latency** and **memory footprint** in **performance-critical embedded environments**.",
+        "Built and deployed applications on **QNX**, handling **cross-compilation** and integration with **system-level services**.",
+        "Designed **platform-agnostic interfaces** to improve portability and reduce duplication across modules."
     ],
 
     kpit_ase=[
-        "Delivered production-grade camera features under strict latency and reliability constraints in embedded systems. ",
-        "Enhanced CI/CD pipelines with automated validation, improving release quality, and reducing regression. ",
-        "Diagnosed and resolved cross-module system issues in complex embedded workflows. "
+        "Delivered **production-grade camera features** under strict latency and reliability constraints in **embedded systems**.",
+        "Enhanced **CI/CD pipelines** with automated validation, improving release quality, and reducing regression.",
+        "Diagnosed and resolved cross-module system issues in complex embedded workflows."
     ],
 
     kpit_trainee=[
-        "Strengthened fundamentals in C/C++, memory management, debugging, and performance optimization. ",
-        "Worked in Agile teams using Git workflows and industry-standard development practices. "
+        "Strengthened fundamentals in **C/C++**, **memory management**, **debugging**, and **performance optimization**.",
+        "Worked in **Agile** teams using **Git** workflows and industry-standard development practices."
     ],
 
     nic=[
-        "Developed an end-to-end web application using Django and MySQL with secure authentication and role-based access control. ",
-        "Designed scalable backend logic and implemented admin-driven workflows. "
+        "Developed an end-to-end **web application** using **Django** and **MySQL** with secure authentication and role-based access control.",
+        "Designed scalable backend logic and implemented **admin-driven workflows**."
     ],
 
     dit=[
-        "Contributed to HimSabe, a real-time vehicle tracking system with responsive UI and backend integration. ",
-        "Integrated frontend with Spring Boot services and MySQL for seamless data flow. "
+        "Contributed to **HimSabe**, a real-time vehicle tracking system with responsive UI and backend integration.",
+        "Integrated frontend with **Spring Boot** services and **MySQL** for seamless data flow."
     ],
 
     skills={
@@ -47,22 +47,22 @@ BASE_RESUME = ResumeOutput(
     },
 
     project_dat=[
-        "Built a Windows-based tracker with encrypted local storage and low runtime overhead. ",
-        "Processed user activity data and generated AI-based daily summaries using OpenAI API. "
+        "Built a **Windows-based** tracker with **encrypted local storage** and low runtime overhead.",
+        "Processed user activity data and generated **AI-based daily summaries** using **OpenAI API**."
     ],
 
     project_gpt=[
-        "Fine-tuned DialoGPT on a custom dataset, handling data preprocessing, tokenization, and training. ",
-        "Improved response relevance and contextual understanding through model tuning. "
+        "Fine-tuned **DialoGPT** on a custom dataset, handling **data preprocessing**, **tokenization**, and **training**.",
+        "Improved response relevance and contextual understanding through model tuning."
     ],
 
     project_acg=[
-        "Built an end-to-end automation pipeline for content scraping, TTS, video generation, and publishing. ",
-        "Integrated multiple APIs and tools to create a modular and scalable workflow. "
+        "Built an end-to-end automation pipeline for **content scraping**, **TTS**, **video generation**, and **publishing**.",
+        "Integrated multiple APIs and tools to create a **modular and scalable workflow**."
     ],
 
     project_cms=[
-        "Developed a full-featured secure CMS with role-based authentication and content publishing workflows. ",
-        "Designed scalable backend architecture and responsive frontend. "
+        "Developed a full-featured secure **CMS** with **role-based authentication** and **content publishing workflows**.",
+        "Designed scalable backend architecture and responsive frontend."
     ]
 )

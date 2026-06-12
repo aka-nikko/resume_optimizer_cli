@@ -1,19 +1,40 @@
+import re
 from docx import Document
 from copy import deepcopy
 from docx.shared import Inches, Pt
 
 
 class DocxWriter:
+    FONT_SIZE = 10
+
+    @staticmethod
+    def apply_font(paragraph):
+        for run in paragraph.runs:
+            run.font.size = Pt(DocxWriter.FONT_SIZE)
+
+    @staticmethod
+    def add_markdown_bold(paragraph, text):
+        parts = re.split(r"(\*\*.*?\*\*)", text)
+
+        for part in parts:
+            if(part.startswith("**") and part.endswith("**")):
+                run = paragraph.add_run(part[2:-2])
+                run.bold = True
+            else:
+                run = paragraph.add_run(part)
+                run.bold = False
+
+            run.font.size = Pt(DocxWriter.FONT_SIZE)
+
     @staticmethod
     def insert_bullet_list(paragraph, bullets):
         current = paragraph
-        current.text = f"• {bullets[0]}"
+        current.clear()
+        current.add_run("• ")
+        DocxWriter.add_markdown_bold(current, bullets[0])
 
         current.paragraph_format.left_indent = Inches(0.25)
         current.paragraph_format.first_line_indent = Inches(0)
-
-        for run in current.runs:
-            run.font.size = Pt(10)
 
         for bullet in bullets[1:]:
             new_p = deepcopy(current._element)
@@ -21,14 +42,13 @@ class DocxWriter:
 
             from docx.text.paragraph import Paragraph
 
-            current = Paragraph(new_p, paragraph._parent)
-            current.text = f"• {bullet}"
+            current = Paragraph(new_p,paragraph._parent)
+            current.clear()
+            current.add_run("• ")
+            DocxWriter.add_markdown_bold(current, bullet)
 
             current.paragraph_format.left_indent = Inches(0.25)
             current.paragraph_format.first_line_indent = Inches(0)
-
-            for run in current.runs:
-                run.font.size = Pt(10)
 
     @staticmethod
     def build_skill_section(skills):
@@ -38,6 +58,12 @@ class DocxWriter:
             lines.append(f"{category}: " + ", ".join(skill_list))
 
         return "\n".join(lines)
+
+    @staticmethod
+    def replace_text(paragraph,text):
+        paragraph.clear()
+        run = paragraph.add_run(text)
+        run.font.size = Pt(DocxWriter.FONT_SIZE)
 
     @staticmethod
     def replace_placeholders(template_path, output_path, resume):
@@ -63,9 +89,8 @@ class DocxWriter:
                     if isinstance(value, list):
                         DocxWriter.insert_bullet_list(paragraph, value)
                     else:
-                        paragraph.text = (paragraph.text.replace(key, value))
-                        
-                        for run in paragraph.runs:
-                            run.font.size = Pt(10)
+                        new_text = (paragraph.text.replace(key, value))
+                        paragraph.clear()
+                        DocxWriter.add_markdown_bold(paragraph, new_text)
 
         doc.save(output_path)
