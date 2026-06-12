@@ -55,7 +55,7 @@ class DocxWriter:
         lines = []
 
         for category, skill_list in skills.items():
-            lines.append(f"{category}: " + ", ".join(skill_list))
+            lines.append(f"**{category}**: " + ", ".join(skill_list))
 
         return "\n".join(lines)
 

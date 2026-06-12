@@ -26,6 +26,12 @@ SYSTEM_PROMPT = """
         Developed **ADAS** features for **QNX-based systems**.
     12. Do not bold entire sentences.
     13. Bold 1-3 important terms per line/sentence.
+    14. Keep the skills section focused and relevant to the job description.
+    15. Use dynamic skill categories based on the job description and resume context.
+    16. Core Skills and Programming Languages may be reused as stable categories when useful.
+    17. Do not force unrelated categories or exhaustive keyword dumps.
+    18. Prefer 3-5 skill categories total and 5-10 skills per category.
+    19. Include only skills that are present in the resume, strongly implied by experience, or directly requested by the job description.
 """
 
 
@@ -40,6 +46,10 @@ class AIOptimizer:
             {current_resume.model_dump_json(indent=2)}
 
             Rewrite the resume to better match the job description.
+            For "skills", choose category names dynamically from the job description.
+            Do not use a hardcoded category set. It is acceptable to keep stable
+            categories like "Core Skills" or "Programming Languages" when they fit.
+            Keep skill lists concise, deduplicated, and ordered by relevance.
             Return JSON in EXACTLY this format:
 
             {{
@@ -53,10 +63,7 @@ class AIOptimizer:
                 "dit": [],
 
                 "skills": {{
-                    "Embedded & Automotive": [],
-                    "Software Engineering": [],
-                    "Backend & Full Stack": [],
-                    "AI & Automation": []
+                    "Dynamic Category Name": []
                 }},
 
                 "project_dat": [],
