@@ -8,15 +8,19 @@ class ResumeValidator:
         experience_count = section_counts.get("experiences", len(resume.experiences))
         project_count = section_counts.get("projects", len(resume.projects))
 
+        if experience_count < 0 or project_count < 0:
+            raise ValueError("Template section counts cannot be negative")
+
         ResumeValidator._validate_summary(resume.summary)
         ResumeValidator._validate_section_count(resume.experiences, experience_count, "experience")
         ResumeValidator._validate_section_count(resume.projects, project_count, "project")
+        ResumeValidator._validate_skills(resume.skills)
 
         for index, bullets in enumerate(resume.experiences[:experience_count], start=1):
             ResumeValidator._validate_bullets(bullets, f"EXPERIENCE_{index}")
 
-        for project in resume.projects[:project_count]:
-            ResumeValidator._validate_projects(project)
+        for index, project in enumerate(resume.projects[:project_count], start=1):
+            ResumeValidator._validate_projects(project, f"PROJECT_{index}")
 
     @staticmethod
     def _validate_section_count(sections, expected_count, section_type):
@@ -36,20 +40,40 @@ class ResumeValidator:
         words = len(summary.split())
 
         if words < 50:
-            raise ValueError("Summary too short")
+            raise ValueError(f"Summary too short: expected 50-80 words, got {words}")
 
         if words > 80:
-            raise ValueError("Summary too long")
+            raise ValueError(f"Summary too long: expected 50-80 words, got {words}")
+
+    @staticmethod
+    def _validate_skills(skills):
+        if not skills:
+            raise ValueError("Skills section must not be empty")
+
+        for category, skill_list in skills.items():
+            if not category.strip():
+                raise ValueError("Skill category names must not be empty")
+
+            if not skill_list:
+                raise ValueError(f"Skill category '{category}' must contain at least one skill")
 
     @staticmethod
     def _validate_bullets(bullets, section):
         if len(bullets) < 2:
-            raise ValueError(f"{section} requires 2-3 bullets")
+            raise ValueError(f"{section} requires at least 2 bullets")
 
         if len(bullets) > 4:
             raise ValueError(f"{section} requires 2-4 bullets")
 
+        for bullet_index, bullet in enumerate(bullets, start=1):
+            if not bullet.strip():
+                raise ValueError(f"{section} bullet {bullet_index} must not be empty")
+
     @staticmethod
-    def _validate_projects(project):
+    def _validate_projects(project, section):
         if len(project) != 2:
-            raise ValueError("Project requires exactly 2 bullets")
+            raise ValueError(f"{section} requires exactly 2 bullets")
+
+        for bullet_index, bullet in enumerate(project, start=1):
+            if not bullet.strip():
+                raise ValueError(f"{section} bullet {bullet_index} must not be empty")

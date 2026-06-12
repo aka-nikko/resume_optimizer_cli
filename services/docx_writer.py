@@ -1,7 +1,11 @@
 import re
-from docx import Document
 from copy import deepcopy
+from pathlib import Path
+
+from docx import Document
+from docx.opc.exceptions import PackageNotFoundError
 from docx.shared import Inches, Pt
+from docx.text.paragraph import Paragraph
 
 
 class DocxWriter:
@@ -9,6 +13,16 @@ class DocxWriter:
     PLACEHOLDER_PATTERN = re.compile(r"\{\{\s*([^{}]+?)\s*\}\}")
     EXPERIENCE_PATTERN = re.compile(r"^EXPERIENCE_(\d+)$")
     PROJECT_PATTERN = re.compile(r"^PROJECT_(\d+)$")
+    MARKDOWN_BOLD_PATTERN = re.compile(r"(\*\*.*?\*\*)")
+
+    @staticmethod
+    def load_document(path):
+        try:
+            return Document(path)
+        except PackageNotFoundError as exc:
+            raise ValueError(f"DOCX file is missing or invalid: {path}") from exc
+        except Exception as exc:
+            raise RuntimeError(f"Unable to read DOCX file '{path}': {exc}") from exc
 
     @staticmethod
     def apply_font(paragraph):
@@ -17,9 +31,12 @@ class DocxWriter:
 
     @staticmethod
     def add_markdown_bold(paragraph, text):
-        parts = re.split(r"(\*\*.*?\*\*)", text)
+        parts = DocxWriter.MARKDOWN_BOLD_PATTERN.split(text)
 
         for part in parts:
+            if not part:
+                continue
+
             if(part.startswith("**") and part.endswith("**")):
                 run = paragraph.add_run(part[2:-2])
                 run.bold = True
@@ -31,6 +48,9 @@ class DocxWriter:
 
     @staticmethod
     def insert_bullet_list(paragraph, bullets):
+        if not bullets:
+            raise ValueError("Cannot insert an empty bullet list into the template")
+
         current = paragraph
         current.clear()
         current.add_run("• ")
@@ -42,9 +62,6 @@ class DocxWriter:
         for bullet in bullets[1:]:
             new_p = deepcopy(current._element)
             current._element.addnext(new_p)
-
-            from docx.text.paragraph import Paragraph
-
             current = Paragraph(new_p,paragraph._parent)
             current.clear()
             current.add_run("• ")
@@ -58,6 +75,9 @@ class DocxWriter:
         lines = []
 
         for category, skill_list in skills.items():
+            if not skill_list:
+                continue
+
             lines.append(f"**{category}**: " + ", ".join(skill_list))
 
         return "\n".join(lines)
@@ -85,7 +105,7 @@ class DocxWriter:
 
     @staticmethod
     def get_template_section_counts(template_path):
-        doc = Document(template_path)
+        doc = DocxWriter.load_document(template_path)
         experience_indexes = set()
         project_indexes = set()
 
@@ -131,8 +151,13 @@ class DocxWriter:
 
     @staticmethod
     def replace_placeholders(template_path, output_path, resume):
-        doc = Document(template_path)
+        output = Path(output_path)
+        if output.parent and not output.parent.exists():
+            raise FileNotFoundError(f"Output directory does not exist: {output.parent}")
+
+        doc = DocxWriter.load_document(template_path)
         replacements = DocxWriter.build_replacements(resume)
+        used_placeholders = set()
 
         for paragraph in DocxWriter.iter_paragraphs(doc):
             matches = DocxWriter.PLACEHOLDER_PATTERN.findall(paragraph.text)
@@ -144,6 +169,7 @@ class DocxWriter:
                 value = replacements.get(placeholder)
 
                 if isinstance(value, list):
+                    used_placeholders.add(placeholder)
                     DocxWriter.insert_bullet_list(paragraph, value)
                     continue
 
@@ -153,6 +179,8 @@ class DocxWriter:
                 value = replacements.get(placeholder)
                 if value is None:
                     continue
+
+                used_placeholders.add(placeholder)
 
                 if isinstance(value, list):
                     value = "\n".join(value)
@@ -171,4 +199,18 @@ class DocxWriter:
             paragraph.clear()
             DocxWriter.add_markdown_bold(paragraph, new_text)
 
-        doc.save(output_path)
+        required_placeholders = {"SUMMARY", "SKILLS"}
+        missing_required = sorted(required_placeholders - used_placeholders)
+        if missing_required:
+            raise ValueError(
+                "Template is missing required placeholder(s): " + ", ".join(missing_required)
+            )
+
+        try:
+            doc.save(output_path)
+        except PermissionError as exc:
+            raise PermissionError(
+                f"Cannot write output DOCX '{output_path}'. Close the file if it is open and try again."
+            ) from exc
+        except Exception as exc:
+            raise RuntimeError(f"Unable to write output DOCX '{output_path}': {exc}") from exc

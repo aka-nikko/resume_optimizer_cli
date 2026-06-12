@@ -1,11 +1,12 @@
 import json
 import os
 from dotenv import load_dotenv
-from openai import OpenAI
+from json import JSONDecodeError
+from openai import OpenAI, OpenAIError
+from pydantic import ValidationError
 from models.schemas import ResumeOutput
 
 load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 SYSTEM_PROMPT = """
     You are an expert ATS resume optimizer.
@@ -37,7 +38,18 @@ SYSTEM_PROMPT = """
 
 class AIOptimizer:
     @staticmethod
+    def get_client():
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            raise RuntimeError("OPENAI_API_KEY is missing. Add it to .env or your environment.")
+
+        return OpenAI(api_key=api_key)
+
+    @staticmethod
     def optimize(jd_text: str, current_resume: ResumeOutput, section_counts=None) -> ResumeOutput:
+        if not jd_text or not jd_text.strip():
+            raise ValueError("Job description text must not be empty.")
+
         section_counts = section_counts or {}
         experience_count = section_counts.get("experiences", len(current_resume.experiences))
         project_count = section_counts.get("projects", len(current_resume.projects))
@@ -69,23 +81,53 @@ class AIOptimizer:
             {json.dumps(response_example, indent=4)}
         """
 
-        response = client.chat.completions.create(
-            model="gpt-5",
-            messages=[
-                {
-                    "role": "system",
-                    "content": SYSTEM_PROMPT
-                },
-                {
-                    "role": "user",
-                    "content": prompt
+        try:
+            response = AIOptimizer.get_client().chat.completions.create(
+                model="gpt-5",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": SYSTEM_PROMPT
+                    },
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
+                response_format={
+                    "type": "json_object"
                 }
-            ],
-            response_format={
-                "type": "json_object"
-            }
-        )
+            )
+        except OpenAIError as exc:
+            raise RuntimeError(f"OpenAI request failed: {exc}") from exc
 
-        data = json.loads(response.choices[0].message.content)
+        if not response.choices:
+            raise RuntimeError("OpenAI returned no choices.")
 
-        return ResumeOutput(**data)
+        content = response.choices[0].message.content
+        if not content:
+            raise RuntimeError("OpenAI returned an empty response.")
+
+        try:
+            data = json.loads(content)
+        except JSONDecodeError as exc:
+            raise RuntimeError("OpenAI returned invalid JSON.") from exc
+
+        try:
+            resume = ResumeOutput(**data)
+        except ValidationError as exc:
+            raise RuntimeError(f"OpenAI response did not match the resume schema: {exc}") from exc
+
+        if len(resume.experiences) != experience_count:
+            raise RuntimeError(
+                f"OpenAI returned {len(resume.experiences)} experience sections; "
+                f"template requires {experience_count}."
+            )
+
+        if len(resume.projects) != project_count:
+            raise RuntimeError(
+                f"OpenAI returned {len(resume.projects)} project sections; "
+                f"template requires {project_count}."
+            )
+
+        return resume
