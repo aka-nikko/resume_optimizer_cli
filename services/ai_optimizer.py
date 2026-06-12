@@ -55,21 +55,20 @@ class AIOptimizer:
             {{
                 "summary": "",
 
-                "kpit_se": [],
-                "kpit_ase": [],
-                "kpit_trainee": [],
-
-                "nic": [],
-                "dit": [],
+                "experience_1": [],
+                "experience_2": [],
+                "experience_3": [],
+                "experience_4": [],
+                "experience_5": [],
 
                 "skills": {{
                     "Dynamic Category Name": []
                 }},
 
-                "project_dat": [],
-                "project_gpt": [],
-                "project_acg": [],
-                "project_cms": []
+                "project_1": [],
+                "project_2": [],
+                "project_3": [],
+                "project_4": []
             }}
         """
 

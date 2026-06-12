@@ -5,15 +5,15 @@ class ResumeValidator:
     @staticmethod
     def validate(resume: ResumeOutput):
         ResumeValidator._validate_summary(resume.summary)
-        ResumeValidator._validate_bullets(resume.kpit_se, "KPIT_SE")
-        ResumeValidator._validate_bullets(resume.kpit_ase, "KPIT_ASE")
-        ResumeValidator._validate_bullets(resume.kpit_trainee, "KPIT_TRAINEE")
-        ResumeValidator._validate_bullets(resume.nic, "NIC")
-        ResumeValidator._validate_bullets(resume.dit, "DIT")
-        ResumeValidator._validate_projects(resume.project_dat)
-        ResumeValidator._validate_projects(resume.project_gpt)
-        ResumeValidator._validate_projects(resume.project_acg)
-        ResumeValidator._validate_projects(resume.project_cms)
+        ResumeValidator._validate_bullets(resume.experience_1, "EXPERIENCE_1")
+        ResumeValidator._validate_bullets(resume.experience_2, "EXPERIENCE_2")
+        ResumeValidator._validate_bullets(resume.experience_3, "EXPERIENCE_3")
+        ResumeValidator._validate_bullets(resume.experience_4, "EXPERIENCE_4")
+        ResumeValidator._validate_bullets(resume.experience_5, "EXPERIENCE_5")
+        ResumeValidator._validate_projects(resume.project_1)
+        ResumeValidator._validate_projects(resume.project_2)
+        ResumeValidator._validate_projects(resume.project_3)
+        ResumeValidator._validate_projects(resume.project_4)
 
     @staticmethod
     def _validate_summary(summary):

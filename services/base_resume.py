@@ -10,30 +10,30 @@ BASE_RESUME = ResumeOutput(
         "with a focus on scalable, production-ready systems."
     ),
 
-    kpit_se=[
+    experience_1=[
         "Developed **real-time camera pipeline** and **ADAS** related features for BMW systems on **QNX-based HLOS**.",
         "Optimized **C/C++** modules to reduce **latency** and **memory footprint** in **performance-critical embedded environments**.",
         "Built and deployed applications on **QNX**, handling **cross-compilation** and integration with **system-level services**.",
         "Designed **platform-agnostic interfaces** to improve portability and reduce duplication across modules."
     ],
 
-    kpit_ase=[
+    experience_2=[
         "Delivered **production-grade camera features** under strict latency and reliability constraints in **embedded systems**.",
         "Enhanced **CI/CD pipelines** with automated validation, improving release quality, and reducing regression.",
         "Diagnosed and resolved cross-module system issues in complex embedded workflows."
     ],
 
-    kpit_trainee=[
+    experience_3=[
         "Strengthened fundamentals in **C/C++**, **memory management**, **debugging**, and **performance optimization**.",
         "Worked in **Agile** teams using **Git** workflows and industry-standard development practices."
     ],
 
-    nic=[
+    experience_4=[
         "Developed an end-to-end **web application** using **Django** and **MySQL** with secure authentication and role-based access control.",
         "Designed scalable backend logic and implemented **admin-driven workflows**."
     ],
 
-    dit=[
+    experience_5=[
         "Contributed to **HimSabe**, a real-time vehicle tracking system with responsive UI and backend integration.",
         "Integrated frontend with **Spring Boot** services and **MySQL** for seamless data flow."
     ],
@@ -46,22 +46,22 @@ BASE_RESUME = ResumeOutput(
         "AI & Automation": ["OpenAI API", "Hugging Face", "LLM Fine-Tuning", "Selenium", "Playwright", "FFmpeg", "NumPy", "Pandas"]
     },
 
-    project_dat=[
+    project_1=[
         "Built a **Windows-based** tracker with **encrypted local storage** and low runtime overhead.",
         "Processed user activity data and generated **AI-based daily summaries** using **OpenAI API**."
     ],
 
-    project_gpt=[
+    project_2=[
         "Fine-tuned **DialoGPT** on a custom dataset, handling **data preprocessing**, **tokenization**, and **training**.",
         "Improved response relevance and contextual understanding through model tuning."
     ],
 
-    project_acg=[
+    project_3=[
         "Built an end-to-end automation pipeline for **content scraping**, **TTS**, **video generation**, and **publishing**.",
         "Integrated multiple APIs and tools to create a **modular and scalable workflow**."
     ],
 
-    project_cms=[
+    project_4=[
         "Developed a full-featured secure **CMS** with **role-based authentication** and **content publishing workflows**.",
         "Designed scalable backend architecture and responsive frontend."
     ]
