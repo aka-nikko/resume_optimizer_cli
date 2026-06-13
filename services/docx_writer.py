@@ -171,8 +171,9 @@ class DocxWriter:
     @staticmethod
     def replace_placeholders(template_path, output_path, resume):
         output = Path(output_path)
-        if output.parent and not output.parent.exists():
-            raise FileNotFoundError(f"Output directory does not exist: {output.parent}")
+
+        if output.parent:
+            output.parent.mkdir(parents=True, exist_ok=True)
 
         doc = DocxWriter.load_document(template_path)
         replacements = DocxWriter.build_replacements(resume)

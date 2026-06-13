@@ -25,8 +25,11 @@ def main(resume, jd, output, export_pdf, pdf_output, mode, count):
         if output_path.suffix.lower() != ".docx":
             raise ValueError("Output path must end with .docx")
 
-        if output_path.parent and not output_path.parent.exists():
-            raise FileNotFoundError(f"Output directory does not exist: {output_path.parent}")
+        if output_path.parent == Path('.') or str(output_path.parent) == "":
+            output_path = Path("output") / output_path.name
+
+        if output_path.parent:
+            output_path.parent.mkdir(parents=True, exist_ok=True)
 
         jd_text = JDParser.parse(jd)
         section_counts = DocxWriter.get_template_section_counts(resume)

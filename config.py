@@ -56,4 +56,4 @@ AI_SYSTEM_PROMPT = """
     20. Skills must include "Programming Languages" as the first category.
 """
 
-DEFAULT_OUTPUT_NAME = "output_resume.docx"
+DEFAULT_OUTPUT_NAME = "output/output_resume.docx"

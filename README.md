@@ -63,6 +63,9 @@ Notes
 - `--output` must end with `.docx`.
 - `--count > 1` is only supported with `--mode ai`.
 - PDF export requires Windows and the `docx2pdf` package.
+-- By default, generated files are written to the `output/` directory. The CLI will create the directory automatically if it does not exist.
+
+Note: The repository includes the `output/` directory with generated sample resumes exported during testing — these are attached for reference.
 
 ## Template placeholders
 
