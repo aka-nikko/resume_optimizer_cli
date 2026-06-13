@@ -77,6 +77,20 @@ The writer replaces single-line placeholders with text and full-paragraph placeh
 - The AI mode uses the OpenAI client and expects an API key set in `OPENAI_API_KEY` or a `.env` file (the project loads environment variables via `python-dotenv`).
 - Model, system prompt, and rules are defined in [config.py](config.py). The project expects JSON-only responses from the model and validates them against the schema in [models/schemas.py](models/schemas.py).
 
+## Sample
+<table>
+  <tr>
+    <td align="center">
+      <img src="images/template.jpg" width="400"><br>
+      <b>Template Resume</b>
+    </td>
+    <td align="center">
+      <img src="images/my_resume.jpg" width="400"><br>
+      <b>Generated Resume</b>
+    </td>
+  </tr>
+</table>
+
 ## Contributing
 - Open issues or submit PRs.
 - Follow existing code style.
