@@ -5,36 +5,9 @@ from json import JSONDecodeError
 from openai import OpenAI, OpenAIError
 from pydantic import ValidationError
 from models.schemas import ResumeOutput
+from config import AI_SYSTEM_PROMPT, AI_MODEL, PROGRAMMING_LANGUAGES_CATEGORY
 
 load_dotenv()
-
-SYSTEM_PROMPT = """
-    You are an expert ATS resume optimizer.
-
-    Rules:
-    1. Add skills if not already present.
-    2. Optimize wording to match the job description.
-    3. Summary must be a SINGLE paragraph.
-    4. Summary should be 50-65 words.
-    5. Work experience must contain 2-3 bullet points.
-    6. Every bullet should be one sentence of 12-14 words each.
-    7. Every project must contain exactly 2 bullet points.
-    8. Keep technical accuracy.
-    9. Prioritize ATS keywords naturally.
-    10. Return ONLY valid JSON.
-    11. Bold important ATS keywords using markdown.
-        Example:
-        Developed **ADAS** features for **QNX-based systems**.
-    12. Do not bold entire sentences.
-    13. Bold 1-3 important terms per line/sentence.
-    14. Keep the skills section focused and relevant to the job description.
-    15. Use dynamic skill categories based on the job description and resume context.
-    16. Core Skills and Programming Languages may be reused as stable categories when useful.
-    17. Do not force unrelated categories or exhaustive keyword dumps.
-    18. Prefer 3-4 skill categories total and 5-10 skills per category.
-    19. Include only skills that are present in the resume, strongly implied by experience, or directly requested by the job description.
-    20. Skills must include "Programming Languages" as the first category.
-"""
 
 
 class AIOptimizer:
@@ -58,7 +31,7 @@ class AIOptimizer:
             "summary": "",
             "experiences": [[] for _ in range(experience_count)],
             "skills": {
-                "Programming Languages": [],
+                PROGRAMMING_LANGUAGES_CATEGORY: [],
                 "Dynamic Category Name": []
             },
             "projects": [[] for _ in range(project_count)],
@@ -86,11 +59,11 @@ class AIOptimizer:
 
         try:
             response = AIOptimizer.get_client().chat.completions.create(
-                model="gpt-5",
+                model=AI_MODEL,
                 messages=[
                     {
                         "role": "system",
-                        "content": SYSTEM_PROMPT
+                        "content": AI_SYSTEM_PROMPT
                     },
                     {
                         "role": "user",

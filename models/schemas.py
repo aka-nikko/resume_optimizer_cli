@@ -1,10 +1,10 @@
 from typing import ClassVar, Dict, List
-
 from pydantic import BaseModel, Field, field_validator
+from config import PROGRAMMING_LANGUAGES_CATEGORY
 
 
 class ResumeOutput(BaseModel):
-    PROGRAMMING_LANGUAGES_CATEGORY: ClassVar[str] = "Programming Languages"
+    PROGRAMMING_LANGUAGES_CATEGORY: ClassVar[str] = PROGRAMMING_LANGUAGES_CATEGORY
 
     summary: str
     experiences: List[List[str]] = Field(default_factory=list)

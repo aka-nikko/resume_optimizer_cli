@@ -14,8 +14,7 @@ BASE_RESUME = ResumeOutput(
         [
             "Developed **real-time camera pipeline** and **ADAS** related features for BMW systems on **QNX-based HLOS**.",
             "Optimized **C/C++** modules to reduce **latency** and **memory footprint** in **performance-critical embedded environments**.",
-            "Built and deployed applications on **QNX**, handling **cross-compilation** and integration with **system-level services**.",
-            "Designed **platform-agnostic interfaces** to improve portability and reduce duplication across modules."
+            "Built and deployed applications on **QNX**, handling **cross-compilation** and integration with **system-level services**."
         ],
         [
             "Delivered **production-grade camera features** under strict latency and reliability constraints in **embedded systems**.",

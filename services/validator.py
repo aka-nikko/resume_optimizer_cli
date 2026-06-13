@@ -1,4 +1,11 @@
 from models.schemas import ResumeOutput
+from config import (
+    SUMMARY_MIN_WORDS,
+    SUMMARY_MAX_WORDS,
+    EXPERIENCE_MIN_BULLETS,
+    EXPERIENCE_MAX_BULLETS,
+    PROJECT_BULLETS,
+)
 
 
 class ResumeValidator:
@@ -39,11 +46,11 @@ class ResumeValidator:
 
         words = len(summary.split())
 
-        if words < 50:
-            raise ValueError(f"Summary too short: expected 50-65 words, got {words}")
+        if words < SUMMARY_MIN_WORDS:
+            raise ValueError(f"Summary too short: expected {SUMMARY_MIN_WORDS}-{SUMMARY_MAX_WORDS} words, got {words}")
 
-        if words > 65:
-            raise ValueError(f"Summary too long: expected 50-65 words, got {words}")
+        if words > SUMMARY_MAX_WORDS:
+            raise ValueError(f"Summary too long: expected {SUMMARY_MIN_WORDS}-{SUMMARY_MAX_WORDS} words, got {words}")
 
     @staticmethod
     def _validate_skills(skills):
@@ -59,11 +66,11 @@ class ResumeValidator:
 
     @staticmethod
     def _validate_bullets(bullets, section):
-        if len(bullets) < 2:
-            raise ValueError(f"{section} requires at least 2 bullets")
+        if len(bullets) < EXPERIENCE_MIN_BULLETS:
+            raise ValueError(f"{section} requires at least {EXPERIENCE_MIN_BULLETS} bullets")
 
-        if len(bullets) > 4:
-            raise ValueError(f"{section} requires 2-4 bullets")
+        if len(bullets) > EXPERIENCE_MAX_BULLETS:
+            raise ValueError(f"{section} requires {EXPERIENCE_MIN_BULLETS}-{EXPERIENCE_MAX_BULLETS} bullets")
 
         for bullet_index, bullet in enumerate(bullets, start=1):
             if not bullet.strip():
@@ -71,8 +78,8 @@ class ResumeValidator:
 
     @staticmethod
     def _validate_projects(project, section):
-        if len(project) != 2:
-            raise ValueError(f"{section} requires exactly 2 bullets")
+        if len(project) != PROJECT_BULLETS:
+            raise ValueError(f"{section} requires exactly {PROJECT_BULLETS} bullets")
 
         for bullet_index, bullet in enumerate(project, start=1):
             if not bullet.strip():

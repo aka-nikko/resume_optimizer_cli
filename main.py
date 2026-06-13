@@ -7,12 +7,13 @@ from services.docx_writer import DocxWriter
 from services.validator import ResumeValidator
 from services.ai_optimizer import AIOptimizer
 from services.base_resume import BASE_RESUME
+from config import DEFAULT_OUTPUT_NAME
 
 
 @click.command()
 @click.option("--resume", required=True, type=click.Path(exists=True, dir_okay=False, readable=True))
 @click.option("--jd", required=True, type=click.Path(exists=True, dir_okay=False, readable=True))
-@click.option("--output", default="output_resume.docx")
+@click.option("--output", default=DEFAULT_OUTPUT_NAME)
 @click.option("--mode", default="local", type=click.Choice(["local", "ai"], case_sensitive=False))
 
 def main(resume, jd, output, mode):

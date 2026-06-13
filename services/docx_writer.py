@@ -1,22 +1,32 @@
 import re
 from copy import deepcopy
 from pathlib import Path
-
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_LINE_SPACING
 from docx.opc.exceptions import PackageNotFoundError
 from docx.shared import Inches, Pt
 from docx.text.paragraph import Paragraph
-
 from models.schemas import ResumeOutput
+from config import (
+    FONT_SIZE,
+    PLACEHOLDER_PATTERN,
+    EXPERIENCE_PLACEHOLDER,
+    PROJECT_PLACEHOLDER,
+    MARKDOWN_BOLD_PATTERN,
+    REQUIRED_PLACEHOLDERS,
+    BULLET_LEFT_INDENT_INCHES,
+    BULLET_FIRST_LINE_INDENT_INCHES,
+    BULLET_LINE_SPACING,
+    BULLET_SPACE_BEFORE_PT,
+    BULLET_SPACE_AFTER_PT,
+)
 
 
 class DocxWriter:
-    FONT_SIZE = 10
-    PLACEHOLDER_PATTERN = re.compile(r"\{\{\s*([^{}]+?)\s*\}\}")
-    EXPERIENCE_PATTERN = re.compile(r"^EXPERIENCE_(\d+)$")
-    PROJECT_PATTERN = re.compile(r"^PROJECT_(\d+)$")
-    MARKDOWN_BOLD_PATTERN = re.compile(r"(\*\*.*?\*\*)")
+    PLACEHOLDER_PATTERN = re.compile(PLACEHOLDER_PATTERN)
+    EXPERIENCE_PATTERN = re.compile(EXPERIENCE_PLACEHOLDER)
+    PROJECT_PATTERN = re.compile(PROJECT_PLACEHOLDER)
+    MARKDOWN_BOLD_PATTERN = re.compile(MARKDOWN_BOLD_PATTERN)
 
     @staticmethod
     def load_document(path):
@@ -30,7 +40,7 @@ class DocxWriter:
     @staticmethod
     def apply_font(paragraph):
         for run in paragraph.runs:
-            run.font.size = Pt(DocxWriter.FONT_SIZE)
+            run.font.size = Pt(FONT_SIZE)
 
     @staticmethod
     def add_markdown_bold(paragraph, text):
@@ -47,17 +57,17 @@ class DocxWriter:
                 run = paragraph.add_run(part)
                 run.bold = False
 
-            run.font.size = Pt(DocxWriter.FONT_SIZE)
+            run.font.size = Pt(FONT_SIZE)
 
     @staticmethod
     def apply_bullet_format(paragraph):
         paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT
-        paragraph.paragraph_format.left_indent = Inches(0)
-        paragraph.paragraph_format.first_line_indent = Inches(0)
+        paragraph.paragraph_format.left_indent = Inches(BULLET_LEFT_INDENT_INCHES)
+        paragraph.paragraph_format.first_line_indent = Inches(BULLET_FIRST_LINE_INDENT_INCHES)
         paragraph.paragraph_format.line_spacing_rule = WD_LINE_SPACING.SINGLE
-        paragraph.paragraph_format.line_spacing = 1
-        paragraph.paragraph_format.space_before = Pt(0)
-        paragraph.paragraph_format.space_after = Pt(0)
+        paragraph.paragraph_format.line_spacing = BULLET_LINE_SPACING
+        paragraph.paragraph_format.space_before = Pt(BULLET_SPACE_BEFORE_PT)
+        paragraph.paragraph_format.space_after = Pt(BULLET_SPACE_AFTER_PT)
 
     @staticmethod
     def insert_bullet_list(paragraph, bullets):
@@ -66,7 +76,7 @@ class DocxWriter:
 
         current = paragraph
         current.clear()
-        current.add_run("    • ")
+        current.add_run("• ")
         DocxWriter.add_markdown_bold(current, bullets[0])
         DocxWriter.apply_bullet_format(current)
 
@@ -75,7 +85,7 @@ class DocxWriter:
             current._element.addnext(new_p)
             current = Paragraph(new_p,paragraph._parent)
             current.clear()
-            current.add_run("    • ")
+            current.add_run("• ")
             DocxWriter.add_markdown_bold(current, bullet)
             DocxWriter.apply_bullet_format(current)
 
@@ -95,7 +105,7 @@ class DocxWriter:
     def replace_text(paragraph,text):
         paragraph.clear()
         run = paragraph.add_run(text)
-        run.font.size = Pt(DocxWriter.FONT_SIZE)
+        run.font.size = Pt(FONT_SIZE)
 
     @staticmethod
     def normalize_placeholder_name(name):
@@ -207,9 +217,9 @@ class DocxWriter:
 
             paragraph.clear()
             DocxWriter.add_markdown_bold(paragraph, new_text)
+            paragraph.paragraph_format.line_spacing = BULLET_LINE_SPACING
 
-        required_placeholders = {"SUMMARY", "SKILLS"}
-        missing_required = sorted(required_placeholders - used_placeholders)
+        missing_required = sorted(set(REQUIRED_PLACEHOLDERS) - used_placeholders)
         if missing_required:
             raise ValueError(
                 "Template is missing required placeholder(s): " + ", ".join(missing_required)
