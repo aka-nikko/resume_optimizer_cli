@@ -16,9 +16,10 @@ from config import DEFAULT_OUTPUT_NAME
 @click.option("--output", default=DEFAULT_OUTPUT_NAME)
 @click.option("--export-pdf", is_flag=True, default=False, help="Also export the generated DOCX to PDF (Windows, requires docx2pdf)")
 @click.option("--pdf-output", default=None, type=click.Path(dir_okay=False), help="Optional path for the exported PDF")
+@click.option("--count", default=1, type=int, help="Number of resumes to generate when using AI mode")
 @click.option("--mode", default="local", type=click.Choice(["local", "ai"], case_sensitive=False))
 
-def main(resume, jd, output, export_pdf, pdf_output, mode):
+def main(resume, jd, output, export_pdf, pdf_output, mode, count):
     try:
         output_path = Path(output)
         if output_path.suffix.lower() != ".docx":
@@ -30,38 +31,52 @@ def main(resume, jd, output, export_pdf, pdf_output, mode):
         jd_text = JDParser.parse(jd)
         section_counts = DocxWriter.get_template_section_counts(resume)
 
-        if mode.lower() == "local":
-            result = BASE_RESUME
-        else:
-            result = AIOptimizer.optimize(jd_text, BASE_RESUME, section_counts)
+        if mode.lower() == "local" and count > 1:
+            raise ValueError("'--count' > 1 is supported only when --mode ai is used")
 
-        ResumeValidator.validate(result, section_counts)
-        DocxWriter.replace_placeholders(template_path=resume, output_path=str(output_path), resume=result)
+        generated = []
+        for i in range(1, max(1, count) + 1):
+            if mode.lower() == "local":
+                result = BASE_RESUME
+            else:
+                result = AIOptimizer.optimize(jd_text, BASE_RESUME, section_counts)
 
-        if export_pdf:
-            pdf_path = Path(pdf_output) if pdf_output else output_path.with_suffix('.pdf')
+            ResumeValidator.validate(result, section_counts)
 
-            try:
-                import platform
-                if platform.system() != "Windows":
-                    raise RuntimeError("PDF export is supported only on Windows using docx2pdf")
+            if count == 1:
+                out_path = output_path
+            else:
+                stem = output_path.stem
+                out_path = output_path.with_name(f"{stem}_{i}").with_suffix('.docx')
+
+            DocxWriter.replace_placeholders(template_path=resume, output_path=str(out_path), resume=result)
+            generated.append(out_path)
+
+            if export_pdf:
+                pdf_path = Path(pdf_output) if pdf_output and count == 1 else out_path.with_suffix('.pdf')
 
                 try:
-                    from docx2pdf import convert
-                except Exception as exc:
-                    raise RuntimeError(
-                        "PDF export requires the 'docx2pdf' package. Install it with 'pip install docx2pdf'"
-                    ) from exc
+                    import platform
+                    if platform.system() != "Windows":
+                        raise RuntimeError("PDF export is supported only on Windows using docx2pdf")
 
-                convert(str(output_path), str(pdf_path))
-            except Exception as exc:
-                raise RuntimeError(f"Failed to export PDF: {exc}") from exc
+                    try:
+                        from docx2pdf import convert
+                    except Exception as exc:
+                        raise RuntimeError(
+                            "PDF export requires the 'docx2pdf' package. Install it with 'pip install docx2pdf'"
+                        ) from exc
+
+                    convert(str(out_path), str(pdf_path))
+                except Exception as exc:
+                    raise RuntimeError(f"Failed to export PDF for {out_path}: {exc}") from exc
     except (OSError, ValueError, RuntimeError, ValidationError) as exc:
         raise click.ClickException(str(exc)) from exc
 
-    click.echo(f"Resume generated: {output_path}")
-    if export_pdf:
-        click.echo(f"PDF exported: {pdf_path}")
+    for p in generated:
+        click.echo(f"Resume generated: {p}")
+        if export_pdf:
+            click.echo(f"PDF exported: {p.with_suffix('.pdf')}")
 
 
 if __name__ == "__main__":
